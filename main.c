@@ -4,6 +4,7 @@
 #include <termios.h>
 #include <unistd.h>
 #include <sys/time.h>
+#include <sys/mman.h>
 
 #define UP 'w'
 #define DOWN 's'
@@ -78,7 +79,7 @@ void initFruit(Fruit *fruit, Board *board) {
 }
 
 void render(Board *board, Snake *snake, Fruit *fruit) {
-    printf("\e[1;1H\e[2J");
+    //printf("\e[1;1H\e[2J");
 
     for (int i = 0; i < board->height; i++) {
         for (int j = 0; j < board->width; j++) {
@@ -102,8 +103,17 @@ void render(Board *board, Snake *snake, Fruit *fruit) {
     }
 }
 
-void updateSnake(Snake *snake, Fruit *fruit, int *isGameOver, Board *board) {
+void updateSnake(Snake *snake, Fruit *fruit, int *isGameOver, Board *board, char *c) {
     Point nextHead = snake->body[0];
+    printf("%c dvojta bomba\n", *c);
+
+    if ((*c == UP && snake->direction != DOWN) ||
+               (*c == DOWN && snake->direction != UP) ||
+               (*c == LEFT && snake->direction != RIGHT) ||
+               (*c == RIGHT && snake->direction != LEFT)) 
+               {
+                snake->direction = *c;
+                }
 
     switch (snake->direction) {
         case UP: nextHead.y--; break;
@@ -136,7 +146,7 @@ void updateSnake(Snake *snake, Fruit *fruit, int *isGameOver, Board *board) {
     }
 
     snake->body[0] = nextHead;
-    render(&board, &snake, &fruit);
+    render(board, snake, fruit);
 }
 
 void handleInput(Snake *snake) {
@@ -152,6 +162,11 @@ void handleInput(Snake *snake) {
                 
                 return;
                }
+}
+
+void changeDir(char *dir){
+    *dir = getchar();
+    printf("%c\n", *dir);
 }
 
 int main() {
@@ -185,22 +200,55 @@ int main() {
     printf("%lld, %lld", (tv.tv_sec * 1000LL) + (tv.tv_usec / 1000) - start, end - start);
     printf("%d", end >= (tv.tv_sec * 1000LL) + (tv.tv_usec / 1000));
 
-    while (!isGameOver && end >= (tv.tv_sec * 1000LL) + (tv.tv_usec / 1000)) {
-        printf("Time left %lld millisecs to execute \n", end - (tv.tv_sec * 1000LL) + (tv.tv_usec / 1000));
-        gettimeofday(&tv, NULL);
+    char *dir = mmap(NULL, sizeof(char), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
 
-        handleInput(&snake);
-        updateSnake(&snake, &fruit, &isGameOver, &board);
+    if (dir == MAP_FAILED) {
+        perror("mmap failed");
+        exit(1);
+    }
+
+    *dir = RIGHT;
+
+    int id = fork();
+    
+    if (id == 0) {
+        while (!isGameOver) {
+            char input = getchar();
+
+            if (input == UP || input == DOWN || input == LEFT || input == RIGHT) {
+                *dir = input;
+            }
+        }
+
+        return 0;
+    } else {
+        long long tick = (tv.tv_sec * 1000LL) + (tv.tv_usec / 1000);
+        long long noTicks = 0;
+
+        while (!isGameOver && end >= (tv.tv_sec * 1000LL) + (tv.tv_usec / 1000)) {
+            tick = (tv.tv_sec * 1000LL) + (tv.tv_usec / 1000);
+            gettimeofday(&tv, NULL);
+
+            if ((tick - start) / 500 > noTicks) {
+                ++noTicks;
+
+                char latestDir = *dir;
+                printf("Parent reads direction: %c\n", latestDir);
+                updateSnake(&snake, &fruit, &isGameOver, &board, dir);
+            }
+        }
     }
 
     if (isGameOver) {
         printf("Game Over!\n");
     } else {
+        isGameOver = 1;
         printf("Time's up!\n");
     }
 
     freeSnake(&snake);
     freeBoard(&board);
+    munmap(dir, sizeof(char));
 
     return 0;
 }
