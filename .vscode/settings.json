@@ -2,6 +2,18 @@
     "files.associations": {
         "stdio.h": "c",
         "stdlib.h": "c",
-        "mman.h": "c"
-    }
+        "mman.h": "c",
+        "termios.h": "c",
+        "time.h": "c",
+        "board.h": "c",
+        "unistd.h": "c",
+        "snake.h": "c",
+        "timer.h": "c",
+        "limits": "c",
+        "pthread.h": "c",
+        "fcntl.h": "c",
+        "atomic": "c"
+    },
+    "cmake.sourceDirectory": "/home/tarcakova/pokus/client",
+    "C_Cpp.errorSquiggles": "disabled"
 }

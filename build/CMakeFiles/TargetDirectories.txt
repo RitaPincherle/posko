@@ -1,0 +1,11 @@
+/home/tarcakova/pokus/build/CMakeFiles/edit_cache.dir
+/home/tarcakova/pokus/build/CMakeFiles/rebuild_cache.dir
+/home/tarcakova/pokus/build/shared/CMakeFiles/shared.dir
+/home/tarcakova/pokus/build/shared/CMakeFiles/edit_cache.dir
+/home/tarcakova/pokus/build/shared/CMakeFiles/rebuild_cache.dir
+/home/tarcakova/pokus/build/client/CMakeFiles/client_exec.dir
+/home/tarcakova/pokus/build/client/CMakeFiles/edit_cache.dir
+/home/tarcakova/pokus/build/client/CMakeFiles/rebuild_cache.dir
+/home/tarcakova/pokus/build/server/CMakeFiles/server_exec.dir
+/home/tarcakova/pokus/build/server/CMakeFiles/edit_cache.dir
+/home/tarcakova/pokus/build/server/CMakeFiles/rebuild_cache.dir

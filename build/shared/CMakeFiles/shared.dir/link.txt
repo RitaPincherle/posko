@@ -1,0 +1,2 @@
+/usr/bin/ar qc libshared.a CMakeFiles/shared.dir/board.c.o CMakeFiles/shared.dir/snake.c.o CMakeFiles/shared.dir/timer.c.o
+/usr/bin/ranlib libshared.a
